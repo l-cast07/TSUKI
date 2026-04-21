@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración | TSUKI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --accent: #ffffff;
+            --text-muted: #b0b0b0; 
+            --border: #333; 
+            --border-hover: #555;
+            --success: #00ff88;
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--accent);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 80px 10%;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 50px;
+            transition: var(--transition);
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+            transform: translateX(-5px);
+        }
+
+        h1 {
+            font-weight: 200;
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+            letter-spacing: -1px;
+        }
+
+        h1 span { font-weight: 600; }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 60px;
+            border-top: 1px solid var(--border);
+            padding: 60px 0;
+        }
+
+        .section-header .section-title {
+            font-size: 0.75rem;
+            color: var(--accent); 
+            letter-spacing: 3px;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .section-header .section-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .input-group {
+            margin-bottom: 35px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        input, select {
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            width: 100%;
+            padding: 12px 0;
+            color: white;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: var(--transition);
+            appearance: none; /* Quita el estilo por defecto del sistema */
+        }
+
+        /* Ajuste específico para la lista de métodos de pago */
+        select option {
+            background-color: #111; /* Fondo oscuro para la lista */
+            color: white; /* Letras blancas */
+            padding: 15px;
+        }
+
+        input:focus, select:focus {
+            border-bottom-color: var(--accent);
+        }
+
+        .status-badge {
+            font-size: 0.6rem;
+            padding: 4px 8px;
+            border: 1px solid var(--success);
+            color: var(--success);
+            letter-spacing: 1px;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        .btn-save {
+            background: var(--accent);
+            border: 1px solid var(--accent);
+            color: black;
+            padding: 14px 40px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            transition: var(--transition);
+        }
+
+        .btn-save:hover {
+            background: none;
+            color: var(--accent);
+        }
+
+        .btn-secondary {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--accent);
+            padding: 10px 25px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            transition: var(--transition);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+        }
+
+        @media (max-width: 768px) {
+            .settings-grid { grid-template-columns: 1fr; gap: 30px; padding: 40px 0; }
+            body { padding: 40px 5%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="../portal.html" class="back-link">
+            <span style="margin-right: 10px;">←</span> VOLVER AL PORTAL
+        </a>
+
+        <h1>Ajustes de <span>Cuenta</span></h1>
+        
+        <div class="settings-grid">
+            <div class="section-header">
+                <span class="section-title">IDENTIDAD</span>
+                <p class="section-desc">Gestiona tu información personal y estado de verificación legal.</p>
+            </div>
+            
+            <form class="form-container" onsubmit="event.preventDefault();">
+                <div class="input-group">
+                    <label>ESTADO KYC <span class="status-badge">VERIFICADO</span></label>
+                    <input type="text" value="BRUCE WAYNE" readonly style="color: var(--text-muted); border-bottom: none;">
+                </div>
+                
+                <div class="input-group">
+                    <label for="email">CORREO ELECTRÓNICO</label>
+                    <input type="email" id="email" value="batman@tsuki.com" spellcheck="false">
+                </div>
+
+                <div class="input-group">
+                    <label for="country">PAÍS DE RESIDENCIA</label>
+                    <input type="text" id="country" value="ESTADOS UNIDOS">
+                </div>
+                <button type="submit" class="btn-save">ACTUALIZAR PERFIL</button>
+            </form>
+        </div>
+
+        <div class="settings-grid">
+            <div class="section-header">
+                <span class="section-title">SEGURIDAD</span>
+                <p class="section-desc">Protege tu capital configurando la autenticación de dos factores.</p>
+            </div>
+            
+            <div class="form-container">
+                <div class="input-group">
+                    <label>AUTENTICACIÓN 2FA</label>
+                    <p style="font-size: 0.9rem; margin-bottom: 20px;">La autenticación de dos factores no está activa.</p>
+                    <button class="btn-secondary">CONFIGURAR GOOGLE AUTHENTICATOR</button>
+                </div>
+                
+                <div class="input-group">
+                    <label>CONTRASEÑA</label>
+                    <button class="btn-secondary">CAMBIAR CONTRASEÑA</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-grid">
+            <div class="section-header">
+                <span class="section-title">MÉTODOS DE PAGO</span>
+                <p class="section-desc">Configura dónde deseas recibir tus repartos de beneficios (Payouts).</p>
+            </div>
+            
+            <div class="form-container">
+                <div class="input-group">
+                    <label for="payout">MÉTODO PREFERIDO</label>
+                    <select id="payout">
+                        <option value="crypto">CRIPTOMONEDAS (USDT - TRC20)</option>
+                        <option value="bank">TRANSFERENCIA BANCARIA (DEEL)</option>
+                        <option value="wise">WISE</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="wallet">DIRECCIÓN DE BILLETERA / CUENTA</label>
+                    <input type="text" id="wallet" placeholder="0x..." value="T9yD6nH8MvX7pW9zQ2rS1tU0vW9xY8z">
+                </div>
+                <button type="submit" class="btn-save">GUARDAR METODO DE PAGO</button>
+            </div>
+        </div>
+
+        <div class="settings-grid">
+            <div class="section-header">
+                <span class="section-title">TRADING TERMINAL</span>
+                <p class="section-desc">Credenciales y descargas para operar en los mercados.</p>
+            </div>
+            
+            <div class="form-container">
+                <div class="input-group">
+                    <label>PLATAFORMA ASIGNADA</label>
+                    <input type="text" value="MetaTrader 5 (MT5)" readonly style="border-bottom: none;">
+                </div>
+                <div style="display: flex; gap: 20px;">
+                    <a href="https://www.metatrader5.com/es/download" style="text-decoration: none; color: white;">
+                    <button class="btn-secondary">DESCARGAR PARA WINDOWS</button>
+                    <button class="btn-secondary">DESCARGAR PARA MACOS</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

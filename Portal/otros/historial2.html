@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retiros | TSUKI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --bg-dark: #070707; 
+            --bg-card: #111111; 
+            --accent: #ffffff; 
+            --text-muted: #666; 
+            --border: #222; 
+            --success: #00ff88;
+            --danger: #ff4444;
+        }
+        
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--accent); 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            padding: 40px 5%; 
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        .back-link {
+            display: inline-block;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+        .back-link:hover { color: var(--accent); }
+
+        /* Grid Layout */
+        .withdraw-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 30px;
+        }
+
+        h3 { font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-top: 0; margin-bottom: 25px; }
+
+        /* 1. Profit Split */
+        .split-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .split-item:last-child { border: none; }
+        .split-label { font-size: 0.75rem; color: var(--text-muted); }
+        .split-value { font-weight: 700; font-size: 1.1rem; }
+        .highlight { color: var(--success); font-size: 1.5rem; }
+
+        /* 2. Elegibilidad Checklist */
+        .checklist { list-style: none; padding: 0; margin: 0; }
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+            color: #aaa;
+        }
+        .check-icon { font-weight: 700; color: var(--success); }
+        .payout-timer {
+            margin-top: 20px;
+            padding: 15px;
+            background: #000;
+            border: 1px dashed var(--border);
+            text-align: center;
+        }
+
+        /* 3. Formulario */
+        label { display: block; color: var(--text-muted); font-size: 0.65rem; margin-bottom: 8px; letter-spacing: 1px; }
+        input, select { 
+            width: 100%; background: #000; border: 1px solid var(--border); 
+            padding: 12px; color: white; margin-bottom: 20px; box-sizing: border-box; font-family: 'Inter';
+        }
+        .quick-amounts { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn-qty { 
+            flex: 1; background: none; border: 1px solid var(--border); color: var(--text-muted); 
+            padding: 8px; cursor: pointer; font-size: 0.7rem; transition: 0.3s;
+        }
+        .btn-qty:hover { border-color: var(--accent); color: var(--accent); }
+
+        .btn-withdraw { 
+            width: 100%; padding: 15px; background: white; color: black; border: none; 
+            font-weight: 700; cursor: pointer; transition: 0.3s;
+        }
+        .btn-withdraw:disabled { background: #333; cursor: not-allowed; color: #666; }
+
+        /* 4. Historial Table */
+        .table-container { overflow-x: auto; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+        th { text-align: left; padding: 15px; color: var(--text-muted); border-bottom: 1px solid var(--border); font-weight: 400; }
+        td { padding: 15px; border-bottom: 1px solid var(--border); }
+        .status { padding: 4px 8px; border-radius: 2px; font-size: 0.6rem; font-weight: 700; }
+        .status-sent { background: rgba(0, 255, 136, 0.1); color: var(--success); }
+        
+        .btn-action { background: none; border: 1px solid var(--border); color: white; padding: 5px 10px; cursor: pointer; font-size: 0.65rem; text-decoration: none; }
+
+        /* 5. Certificados */
+        .cert-card {
+            background: linear-gradient(45deg, #111, #1a1a1a);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
+        }
+
+        @media (max-width: 768px) { .withdraw-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="../portal.html" class="back-link">← VOLVER AL DASHBOARD</a>
+
+    <div class="withdraw-grid">
+        <div>
+            <div class="card" style="margin-bottom: 20px;">
+                <h3>Profit Split (80/20)</h3>
+                <div class="split-item">
+                    <span class="split-label">Ganancia Total Generada</span>
+                    <span class="split-value">$3,062.50</span>
+                </div>
+                <div class="split-item">
+                    <span class="split-label">Cuota de la Firma (20%)</span>
+                    <span class="split-value">-$612.50</span>
+                </div>
+                <div class="split-item" style="border: none;">
+                    <span class="split-label">TU CUOTA DISPONIBLE</span>
+                    <span class="split-value highlight">$2,450.00</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Estado de Elegibilidad</h3>
+                <div class="checklist">
+                    <div class="check-item"><span class="check-icon">✓</span> KYC Verificado</div>
+                    <div class="check-item"><span class="check-icon">✓</span> Float Zero (No hay operaciones abiertas)</div>
+                    <div class="check-item"><span class="check-icon">✓</span> Días mínimos operados cumplidos</div>
+                    <div class="check-item"><span class="check-icon">✓</span> Sin infracciones de Drawdown</div>
+                </div>
+                <div class="payout-timer">
+                    <label>SIGUIENTE RETIRO DISPONIBLE EN</label>
+                    <div style="font-weight: 700; font-size: 1.2rem; letter-spacing: 2px;">12D 05H 22M</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Solicitar Retiro</h3>
+            <form id="withdrawForm">
+                <label>MÉTODO DE PAGO</label>
+                <select id="method">
+                    <option>Criptomonedas (USDT TRC20)</option>
+                    <option>Deel / Bank Transfer</option>
+                    <option>Wise</option>
+                </select>
+                
+                <label>MONTO A RETIRAR (USD)</label>
+                <input type="number" id="amountInput" placeholder="0.00">
+                <div class="quick-amounts">
+                    <button type="button" class="btn-qty" onclick="setAmount(0.25)">25%</button>
+                    <button type="button" class="btn-qty" onclick="setAmount(0.50)">50%</button>
+                    <button type="button" class="btn-qty" onclick="setAmount(1.0)">100%</button>
+                </div>
+
+                <label>DIRECCIÓN DE DESTINO / EMAIL</label>
+                <input type="text" id="address" placeholder="Ej: TXy7... o email@cuenta.com">
+                
+                <button type="button" class="btn-withdraw" id="btnWithdraw">PROCESAR SOLICITUD</button>
+            </form>
+            <p id="successMsg" style="display:none; color: var(--success); font-size: 0.7rem; text-align: center; margin-top: 15px;">Solicitud enviada correctamente.</p>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 50px;">
+        <h3>Tus Logros</h3>
+        <div class="cert-card">
+            <div>
+                <div style="font-weight: 700; margin-bottom: 5px;">Certificado de Payout Oficial</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">Genera una imagen de tu último cobro para redes sociales.</div>
+            </div>
+            <button class="btn-action" style="background: white; color: black; font-weight: 700; padding: 10px 20px;">DESCARGAR CERTIFICADO</button>
+        </div>
+    </div>
+
+    <div class="card" style="padding: 0;">
+        <h3 style="padding: 30px 30px 0 30px;">Historial de Payouts</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Monto Bruto</th>
+                        <th>Monto Recibido</th>
+                        <th>Método / Hash</th>
+                        <th>Estado</th>
+                        <th>Factura</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>15 Mar 2024</td>
+                        <td>$1,200.00</td>
+                        <td>$960.00</td>
+                        <td><a href="#" class="back-link" style="margin:0; font-family: monospace;">0x7a2...f31</a></td>
+                        <td><span class="status status-sent">ENVIADO</span></td>
+                        <td><button class="btn-action">PDF</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const availableProfit = 2450.00;
+
+    function setAmount(percent) {
+        document.getElementById('amountInput').value = (availableProfit * percent).toFixed(2);
+    }
+
+    const btn = document.getElementById('btnWithdraw');
+    btn.addEventListener('click', () => {
+        const addr = document.getElementById('address').value;
+        const amt = document.getElementById('amountInput').value;
+
+        if(!addr || !amt) {
+            alert("Por favor completa los campos");
+            return;
+        }
+
+        btn.innerText = "PROCESANDO...";
+        btn.disabled = true;
+
+        setTimeout(() => {
+            btn.style.display = 'none';
+            document.getElementById('successMsg').style.display = 'block';
+        }, 2000);
+    });
+</script>
+
+</body>
+</html>

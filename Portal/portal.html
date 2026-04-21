@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | TSUKI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-dark: #070707;
+            --bg-card: #111111;
+            --accent: #ffffff;
+            --text-muted: #666;
+            --border: #222;
+            --success: #00ff88;
+            --danger: #ff4444;
+            --warning: #ffbb33;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--accent);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            border-right: 1px solid var(--border);
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            box-sizing: border-box;
+            background: var(--bg-dark);
+            z-index: 100;
+        }
+
+        .sidebar .logo { 
+            font-weight: 700; 
+            letter-spacing: 5px; 
+            margin-bottom: 50px; 
+            text-decoration: none; 
+            color: white; 
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex-grow: 1;
+        }
+
+        .sidebar-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        .sidebar-nav a:hover, .sidebar-nav a.active { color: var(--accent); }
+
+        .logout-link {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+
+        /* Main Content */
+        .main-content { padding: 40px 5%; }
+
+        /* Sections Grid */
+        .section-title {
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-box {
+            background: var(--bg-card);
+            padding: 25px;
+            border: 1px solid var(--border);
+        }
+
+        .big-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        /* Progress Bars */
+        .progress-container { margin-top: 15px; }
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.65rem;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+        }
+        .progress-bar-bg {
+            background: #222;
+            height: 6px;
+            width: 100%;
+            border-radius: 3px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: 0.5s;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.8rem;
+        }
+        .data-table th {
+            text-align: left;
+            color: var(--text-muted);
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 400;
+        }
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 20px;
+            height: 350px;
+            margin-bottom: 40px;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--success);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-left: 10px;
+        }
+
+        .btn-card {
+            padding: 10px 25px;
+            background: none;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+
+        .btn-card:hover { background: var(--accent); color: var(--bg-dark); }
+
+        @media (max-width: 1024px) {
+            .dashboard-container { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <a href="/Prop/index.html" class="logo">TSUKI</a>
+        <nav class="sidebar-nav">
+            <a href="#" class="active">Overview</a>
+            <a href="otros/historial.html">Historial</a>
+            <a href="otros/retiros.html">Retiros</a>
+            <a href="otros/configuracion.html">Configuración</a>
+        </nav>
+        <a href="../index.html" class="logout-link">SALIR</a>
+    </aside>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px;">
+            <div>
+                <h2 style="font-weight: 200; margin: 0;">Account <span style="font-weight: 700;">#88291</span> <span class="status-badge">ACTIVA</span></h2>
+                <p style="color: var(--text-muted); font-size: 0.7rem; margin-top: 10px;">ÚLTIMA ACTUALIZACIÓN: 05 ABRIL 2026 - 14:30 (MT5)</p>
+            </div>
+            <button class="btn-card">CREDENCIALES</button>
+        </div>
+
+        <h3 class="section-title">Métricas de Capital</h3>
+        <div class="grid-3">
+            <div class="stat-box">
+                <p style="color: var(--text-muted); font-size: .7rem; margin: 0; letter-spacing: 1px;">BALANCE ACTUAL</p>
+                <div class="big-number">$52,450.00</div>
+            </div>
+            <div class="stat-box">
+                <p style="color: var(--text-muted); font-size: .7rem; margin: 0; letter-spacing: 1px;">EQUITY (TIEMPO REAL)</p>
+                <div class="big-number" style="color: var(--success);">$52,610.00</div>
+            </div>
+            <div class="stat-box">
+                <p style="color: var(--text-muted); font-size: .7rem; margin: 0; letter-spacing: 1px;">MARGEN LIBRE</p>
+                <div class="big-number">$51,200.00</div>
+            </div>
+        </div>
+
+        <h3 class="section-title">Monitor de Reglas (Límites Críticos)</h3>
+        <div class="grid-3">
+            <div class="stat-box">
+                <div class="progress-label">
+                    <span>DAILY DRAWDOWN</span>
+                    <span>-$450.00 / $2,500.00</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: 18%; background: var(--warning);"></div>
+                </div>
+            </div>
+            <div class="stat-box">
+                <div class="progress-label">
+                    <span>MAX. DRAWDOWN</span>
+                    <span>$50,000.00 LÍMITE</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: 85%; background: var(--success);"></div>
+                </div>
+            </div>
+            <div class="stat-box">
+                <div class="progress-label">
+                    <span>PROFIT TARGET</span>
+                    <span>65% COMPLETADO</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: 65%; background: var(--accent);"></div>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="section-title">Equity Curve vs Max Drawdown</h3>
+        <div class="chart-container">
+            <canvas id="equityChart"></canvas>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-bottom: 40px;">
+            <div class="stat-box">
+                <h3 class="section-title" style="border:none">Estado de Cuenta</h3>
+                <div style="margin-bottom: 15px;">
+                    <span style="color: var(--text-muted); font-size: 0.7rem;">DÍAS DE TRADING:</span>
+                    <div style="font-weight: 700;">12 / 5 Días mín.</div>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.7rem;">ESTATUS LEGAL:</span>
+                    <div style="font-weight: 700; color: var(--success);">CUMPLIENDO REGLAS</div>
+                </div>
+            </div>
+            
+            <div class="stat-box" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                <div>
+                    <p style="color: var(--text-muted); font-size: .65rem; margin: 0;">WIN RATE</p>
+                    <div style="font-size: 1.2rem; font-weight: 700;">70%</div>
+                </div>
+                <div>
+                    <p style="color: var(--text-muted); font-size: .65rem; margin: 0;">PROFIT FACTOR</p>
+                    <div style="font-size: 1.2rem; font-weight: 700;">1.85</div>
+                </div>
+                <div>
+                    <p style="color: var(--text-muted); font-size: .65rem; margin: 0;">AVG WIN / LOSS</p>
+                    <div style="font-size: 1rem; font-weight: 700;">$420 / -$210</div>
+                </div>
+                <div>
+                    <p style="color: var(--text-muted); font-size: .65rem; margin: 0;">MEJOR OPERACIÓN</p>
+                    <div style="font-size: 1rem; font-weight: 700; color: var(--success);">+$1,250.00</div>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="section-title">Últimas Posiciones</h3>
+        <div class="stat-box" style="padding: 0;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>SÍMBOLO</th>
+                        <th>TIPO</th>
+                        <th>VOLUMEN</th>
+                        <th style="text-align: right;">RESULTADO ($)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>NASDAQ</td>
+                        <td style="color: var(--success);">BUY</td>
+                        <td>2.00</td>
+                        <td style="text-align: right; color: var(--success);">+$450.00</td>
+                    </tr>
+                    <tr>
+                        <td>NASDAQ</td>
+                        <td style="color: var(--danger);">SELL</td>
+                        <td>5.00</td>
+                        <td style="text-align: right; color: var(--danger);">-$120.00</td>
+                    </tr>
+                    <tr>
+                        <td>NASDAQ</td>
+                        <td style="color: var(--success);">BUY</td>
+                        <td>1.50</td>
+                        <td style="text-align: right; color: var(--success);">+$890.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<script>
+    const ctx = document.getElementById('equityChart').getContext('2d');
+    
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
+    gradient.addColorStop(1, 'rgba(7, 7, 7, 0)');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+            datasets: [
+                {
+                    label: 'Equity',
+                    data: [50000, 50800, 50400, 51200, 51900, 52100, 52450],
+                    borderColor: '#ffffff',
+                    borderWidth: 2,
+                    fill: true,
+                    backgroundColor: gradient,
+                    tension: 0.4,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#ffffff'
+                },
+                {
+                    label: 'Max Drawdown Limit',
+                    data: [47500, 47500, 47500, 47500, 47500, 47500, 47500],
+                    borderColor: 'rgba(255, 68, 68, 0.5)',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    fill: false,
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: '#666', font: { size: 10 } } },
+                y: { 
+                    grid: { color: '#1a1a1a' }, 
+                    ticks: { 
+                        color: '#666', 
+                        font: { size: 10 },
+                        callback: function(value) { return '$' + value.toLocaleString(); }
+                    } 
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

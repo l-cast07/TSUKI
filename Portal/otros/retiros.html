@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retiros | TSUKI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --bg-dark: #070707; 
+            --bg-card: #111111; 
+            --accent: #ffffff; 
+            --text-muted: #666; 
+            --border: #222; 
+        }
+        
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--accent); 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            padding: 60px 10%; 
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        .back-link:hover { color: var(--accent); }
+
+        .withdraw-card { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border); 
+            padding: 40px; 
+            max-width: 500px; 
+            margin: 0 auto; 
+        }
+
+        .balance-info { text-align: center; margin-bottom: 30px; }
+        .amount { font-size: 2.5rem; font-weight: 700; }
+        
+        label { 
+            display: block; 
+            color: var(--text-muted); 
+            font-size: 0.7rem; 
+            margin-bottom: 10px; 
+            letter-spacing: 1px; 
+        }
+
+        input, select { 
+            width: 100%; 
+            background: #000; 
+            border: 1px solid var(--border); 
+            padding: 15px; 
+            color: white; 
+            margin-bottom: 20px; 
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-withdraw { 
+            width: 100%; 
+            padding: 15px; 
+            background: white; 
+            color: black; 
+            border: none; 
+            font-weight: 700; 
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-withdraw:hover { background: #e0e0e0; }
+
+        /* Estilos del Spinner */
+        .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(0, 0, 0, 0.2);
+            border-radius: 50%;
+            border-top-color: #000;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Mensaje de Éxito */
+        .success-msg {
+            display: none;
+            color: #00ff88;
+            font-size: 0.75rem;
+            text-align: center;
+            margin-top: 20px;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <div style="max-width: 500px; margin: 0 auto;">
+        <a href="../portal.html" class="back-link">← VOLVER AL DASHBOARD</a>
+
+        <div class="withdraw-card">
+            <div class="balance-info">
+                <label>PROFIT DISPONIBLE (80%)</label>
+                <div class="amount">$2,450.00</div>
+            </div>
+            
+            <form id="withdrawForm">
+                <label>MÉTODO DE PAGO</label>
+                <select id="method">
+                    <option>Criptomonedas (USDT TRC20)</option>
+                    <option>Transferencia Bancaria (Deel)</option>
+                </select>
+                
+                <label>DIRECCIÓN DE BILLETERA / CUENTA</label>
+                <input type="text" id="address" placeholder="Ingrese los detalles de destino" required>
+                
+                <button type="button" class="btn-withdraw" id="btnWithdraw">
+                    <span id="btnText">SOLICITAR RETIRO</span>
+                    <div class="spinner" id="loader"></div>
+                </button>
+            </form>
+            <div class="success-msg" id="successMsg">SOLICITUD ENVIADA CON ÉXITO</div>
+        </div>
+    </div>
+
+    <script>
+        const btn = document.getElementById('btnWithdraw');
+        const btnText = document.getElementById('btnText');
+        const loader = document.getElementById('loader');
+        const successMsg = document.getElementById('successMsg');
+        const addressInput = document.getElementById('address');
+
+        btn.addEventListener('click', () => {
+            // Validación simple: si el campo está vacío, no hace nada
+            if (addressInput.value === "") {
+                addressInput.style.borderColor = "#ff4444";
+                return;
+            }
+
+            // 1. Mostrar estado de carga
+            btnText.style.display = 'none';
+            loader.style.display = 'block';
+            btn.style.pointerEvents = 'none';
+            btn.style.opacity = '0.7';
+
+            // 2. Simular espera del servidor (2 segundos)
+            setTimeout(() => {
+                loader.style.display = 'none';
+                btn.style.display = 'none'; // Ocultamos el botón tras el éxito
+                successMsg.style.display = 'block'; // Mostramos confirmación
+            }, 2000);
+        });
+
+        // Limpiar error al escribir
+        addressInput.addEventListener('input', () => {
+            addressInput.style.borderColor = "var(--border)";
+        });
+    </script>
+</body>
+</html>

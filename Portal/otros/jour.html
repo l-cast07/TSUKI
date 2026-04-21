@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TSUKI | Trading Journal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        zBg: '#0a0a0a',       
+                        zCard: '#111111',     
+                        zBorder: '#1f1f1f',   
+                        zAccent: '#ffffff',   
+                        zSecondary: '#a0a0a0',
+                        zGreen: '#10b981',    
+                        zRed: '#ef4444',      
+                        zCyan: '#00d4ff'      
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0a0a0a; color: #ffffff; }
+        .glass-card { background: #111111; border: 1px solid #1f1f1f; }
+        input, select { 
+            background: #0a0a0a !important; 
+            border: 1px solid #1f1f1f !important;
+            color: white !important;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+        input:focus { border-color: #ffffff !important; outline: none; }
+        .modal-overlay { background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #1f1f1f; border-radius: 10px; }
+    </style>
+</head>
+<body class="font-sans antialiased">
+
+<nav class="border-b border-zBorder bg-zBg/80 backdrop-blur-md py-4 px-8 flex justify-between items-center sticky top-0 z-50">
+    <div class="flex items-center gap-3">
+        <a href="../../index.html" class="flex items-center gap-3 group">
+            <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center transition-transform group-hover:scale-110">
+                <img src="../../img/moon.png" alt="Logo" class="w-5 h-5 object-contain">
+            </div>
+            <span class="text-xl font-light tracking-widest uppercase text-white">TSUKI</span>
+        </a>
+    </div>
+
+    <div class="flex gap-6 text-[10px] uppercase tracking-[0.2em] text-zSecondary items-center">
+        <button onclick="navigate('dashboard')" class="hover:text-white transition-colors">Dashboard</button>
+        <button onclick="navigate('trades')" class="hover:text-white transition-colors">Journal</button>
+        <button onclick="openModal()" class="bg-white text-black px-4 py-1.5 rounded-sm font-bold hover:bg-zCyan transition-all active:scale-95">
+            + NUEVA ORDEN
+        </button>
+    </div>
+</nav>
+
+    <main class="max-w-7xl mx-auto p-6 md:p-10">
+        
+        <div id="dashboard-view" class="space-y-8">
+            <header>
+                <h1 class="text-3xl font-extralight tracking-tight">Performance Overview</h1>
+                <p class="text-zSecondary text-sm mt-1 font-light italic">Métricas de ejecución técnica.</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="glass-card p-6 rounded">
+                    <p class="text-zSecondary text-[10px] uppercase tracking-[0.2em] mb-1">Total Trades</p>
+                    <h2 id="stat-total" class="text-2xl font-light">0</h2>
+                </div>
+                <div class="glass-card p-6 rounded border-l-2 border-l-zCyan">
+                    <p class="text-zSecondary text-[10px] uppercase tracking-[0.2em] mb-1">Win Rate</p>
+                    <h2 id="stat-winrate" class="text-2xl font-light">0%</h2>
+                </div>
+                <div class="glass-card p-6 rounded">
+                    <p class="text-zSecondary text-[10px] uppercase tracking-[0.2em] mb-1">Net PnL</p>
+                    <h2 id="stat-pnl" class="text-2xl font-light">$0.00</h2>
+                </div>
+                <div class="glass-card p-6 rounded">
+                    <p class="text-zSecondary text-[10px] uppercase tracking-[0.2em] mb-1">Avg R:R</p>
+                    <h2 id="stat-rr" class="text-2xl font-light">0.0</h2>
+                </div>
+            </div>
+
+            <div class="glass-card p-8 rounded-lg">
+                <h3 class="text-[10px] uppercase tracking-widest text-zSecondary mb-6">Equity Curve (Capital acumulado)</h3>
+                <div class="h-[350px]">
+                    <canvas id="equityChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="trades-view" class="hidden space-y-6">
+            <header class="flex justify-between items-end">
+                <div>
+                    <h1 class="text-3xl font-extralight tracking-tight">Trade History</h1>
+                    <p class="text-zSecondary text-sm mt-1 font-light">Registro histórico de todas las posiciones.</p>
+                </div>
+                <button onclick="exportData()" class="text-[10px] border border-zBorder px-4 py-2 uppercase tracking-widest hover:bg-white hover:text-black transition">Exportar JSON</button>
+            </header>
+
+            <div class="glass-card rounded overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-zBg text-[10px] uppercase tracking-widest text-zSecondary border-b border-zBorder">
+                        <tr>
+                            <th class="p-4">Fecha</th>
+                            <th class="p-4">Activo</th>
+                            <th class="p-4">Tipo</th>
+                            <th class="p-4">R:R</th>
+                            <th class="p-4 text-right">PnL ($)</th>
+                            <th class="p-4 text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trades-table-body" class="text-sm font-light">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div id="tradeModal" class="hidden fixed inset-0 modal-overlay z-[100] flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-md p-8 rounded-lg shadow-2xl relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-zSecondary hover:text-white"><i class="fas fa-times"></i></button>
+            <h2 class="text-xl font-light mb-6 uppercase tracking-[0.2em]">Nueva Operación</h2>
+            
+            <form id="tradeForm" class="space-y-5">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[9px] text-zSecondary uppercase tracking-widest">Activo</label>
+                        <input type="text" id="asset" placeholder="BTC/USD" required>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[9px] text-zSecondary uppercase tracking-widest">Fecha</label>
+                        <input type="date" id="date" required>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[9px] text-zSecondary uppercase tracking-widest">Dirección</label>
+                        <select id="type">
+                            <option value="Long">LONG (Compra)</option>
+                            <option value="Short">SHORT (Venta)</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[9px] text-zSecondary uppercase tracking-widest">Ratio R:R</label>
+                        <input type="number" id="rr" step="0.01" value="2.0" required>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <label class="text-[9px] text-zSecondary uppercase tracking-widest">Resultado PnL ($)</label>
+                    <input type="number" id="pnl" step="0.01" placeholder="Ej: 250 o -100" required>
+                </div>
+
+                <button type="submit" class="w-full bg-white text-black text-xs font-bold py-3 uppercase tracking-[0.2em] hover:bg-zCyan transition mt-4">
+                    Confirmar Registro
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- LÓGICA DE DATOS ---
+        let trades = JSON.parse(localStorage.getItem('tsuki_trades_v1')) || [];
+        let chart;
+
+        // --- NAVEGACIÓN ---
+        function navigate(view) {
+            const dash = document.getElementById('dashboard-view');
+            const journal = document.getElementById('trades-view');
+            
+            if(view === 'dashboard') {
+                dash.classList.remove('hidden');
+                journal.classList.add('hidden');
+                updateStats(); 
+            } else {
+                dash.classList.add('hidden');
+                journal.classList.remove('hidden');
+                renderTable();
+            }
+        }
+
+        // --- MANEJO DEL MODAL ---
+        function openModal() { document.getElementById('tradeModal').classList.remove('hidden'); }
+        function closeModal() { document.getElementById('tradeModal').classList.add('hidden'); }
+
+        // --- GUARDAR TRADE ---
+        document.getElementById('tradeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newTrade = {
+                id: Date.now(),
+                asset: document.getElementById('asset').value.toUpperCase(),
+                date: document.getElementById('date').value,
+                type: document.getElementById('type').value,
+                rr: parseFloat(document.getElementById('rr').value),
+                pnl: parseFloat(document.getElementById('pnl').value)
+            };
+
+            trades.push(newTrade);
+            saveAndRefresh();
+            this.reset();
+            closeModal();
+        });
+
+        function deleteTrade(id) {
+            if(confirm('¿Eliminar esta operación del registro?')) {
+                trades = trades.filter(t => t.id !== id);
+                saveAndRefresh();
+                renderTable();
+            }
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('tsuki_trades_v1', JSON.stringify(trades));
+            updateStats();
+        }
+
+        // --- CÁLCULO DE ESTADÍSTICAS ---
+        function updateStats() {
+            const total = trades.length;
+            const wins = trades.filter(t => t.pnl > 0).length;
+            const pnlSum = trades.reduce((acc, t) => acc + t.pnl, 0);
+            const avgRR = total > 0 ? (trades.reduce((acc, t) => acc + t.rr, 0) / total).toFixed(2) : 0;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-winrate').innerText = total > 0 ? ((wins/total)*100).toFixed(1) + '%' : '0%';
+            document.getElementById('stat-pnl').innerText = `${pnlSum >= 0 ? '+' : ''}$${pnlSum.toFixed(2)}`;
+            document.getElementById('stat-pnl').className = `text-2xl font-light ${pnlSum >= 0 ? 'text-zGreen' : 'text-zRed'}`;
+            document.getElementById('stat-rr').innerText = avgRR;
+
+            updateChart();
+        }
+
+        // --- RENDERIZADO DE TABLA ---
+        function renderTable() {
+            const body = document.getElementById('trades-table-body');
+            body.innerHTML = trades.slice().reverse().map(t => `
+                <tr class="border-b border-zBorder hover:bg-[#151515] transition group">
+                    <td class="p-4 text-zSecondary text-xs">${t.date}</td>
+                    <td class="p-4 font-medium tracking-tight">${t.asset}</td>
+                    <td class="p-4">
+                        <span class="text-[9px] px-2 py-0.5 rounded border ${t.type === 'Long' ? 'border-zGreen text-zGreen' : 'border-zRed text-zRed'}">
+                            ${t.type.toUpperCase()}
+                        </span>
+                    </td>
+                    <td class="p-4 text-zSecondary">${t.rr}</td>
+                    <td class="p-4 text-right font-medium ${t.pnl >= 0 ? 'text-zGreen' : 'text-zRed'}">
+                        ${t.pnl >= 0 ? '+' : ''}${t.pnl.toFixed(2)}
+                    </td>
+                    <td class="p-4 text-center">
+                        <button onclick="deleteTrade(${t.id})" class="text-zSecondary hover:text-zRed opacity-0 group-hover:opacity-100 transition">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // --- GRÁFICA ---
+        function updateChart() {
+            const ctx = document.getElementById('equityChart').getContext('2d');
+            
+            // Ordenar por fecha para la gráfica
+            const sortedTrades = [...trades].sort((a, b) => new Date(a.date) - new Date(b.date));
+            let currentEquity = 0;
+            const dataPoints = [0];
+            const labels = ["Inicio"];
+
+            sortedTrades.forEach((t, i) => {
+                currentEquity += t.pnl;
+                dataPoints.push(currentEquity);
+                labels.push(`#${i+1}`);
+            });
+
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: dataPoints,
+                        borderColor: '#00d4ff',
+                        borderWidth: 1.5,
+                        pointRadius: 2,
+                        pointBackgroundColor: '#00d4ff',
+                        tension: 0.3,
+                        fill: true,
+                        backgroundColor: 'rgba(0, 212, 255, 0.05)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: '#1a1a1a' }, ticks: { color: '#555', font: { size: 10 } } },
+                        x: { grid: { display: false }, ticks: { color: '#555', font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        function exportData() {
+            const blob = new Blob([JSON.stringify(trades)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `tsuki_backup_${new Date().toISOString().slice(0,10)}.json`; a.click();
+        }
+
+        // Inicializar al cargar
+        window.onload = updateStats;
+    </script>
+</body>
+</html>
